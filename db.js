@@ -110,7 +110,13 @@ function report({ from, to } = {}) {
     `SELECT MIN(created_at) first, MAX(created_at) last FROM alerts ${clause}`
   ).get(params);
 
-  return { total, range, bySeverity, byHost, byDay, from: from || null, to: to || null };
+  // The actual alert rows in the window (newest first, incl. dismissed) for the
+  // report table. Capped so a huge history can't blow up the response.
+  const alerts = db.prepare(
+    `SELECT * FROM alerts ${clause} ORDER BY id DESC LIMIT 1000`
+  ).all(params).map(rowToAlert);
+
+  return { total, range, bySeverity, byHost, byDay, alerts, from: from || null, to: to || null };
 }
 
 module.exports = { insert, getActive, dismiss, clear, report, rowToAlert, db };

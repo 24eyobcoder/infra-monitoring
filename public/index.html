@@ -151,6 +151,9 @@
   .alert .a-dismiss{flex-shrink:0;background:none;border:1px solid var(--line);color:var(--faint);
     width:24px;height:24px;border-radius:7px;cursor:pointer;font-size:13px;line-height:1;transition:.15s}
   .alert .a-dismiss:hover{color:var(--down);border-color:var(--line-2)}
+  .alert-more{display:block;text-align:center;font-family:var(--mono);font-size:12px;color:var(--dim);
+    text-decoration:none;padding:8px;border:1px dashed var(--line-2);border-radius:10px;transition:.15s}
+  .alert-more:hover{color:var(--text);border-color:var(--brand)}
 
   @media(max-width:680px){.tiles{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -166,6 +169,7 @@
     </div>
   </div>
   <div class="right">
+    <a class="navlink" href="/report" style="font-size:13px;color:var(--dim);font-family:var(--mono)">Report →</a>
     <button class="tbtn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle light/dark theme">☀</button>
     <div class="live"><span class="pulse"></span><span id="live">connecting…</span></div>
   </div>
@@ -265,14 +269,18 @@ async function load(){
 }
 
 // ---- AI critical issues panel ----
+const CRIT_SHOWN = 3; // home page shows only the most recent few critical alerts
+
 async function loadAlerts(){
   try{
     const res = await fetch('/api/alerts');
     const list = await res.json();
     const panel = document.getElementById('alerts');
     const box = document.getElementById('alerts-list');
-    panel.classList.toggle('show', list.length > 0);
-    box.innerHTML = list.map(a => `
+    const critical = list.filter(a => a.severity === 'critical'); // criticals only
+    const shown = critical.slice(0, CRIT_SHOWN);
+    panel.classList.toggle('show', shown.length > 0);
+    box.innerHTML = shown.map(a => `
       <div class="alert ${esc(a.severity)}">
         <span class="sev">${esc(a.severity)}</span>
         <div class="body">
@@ -284,7 +292,10 @@ async function loadAlerts(){
           <div class="a-summary">${esc(a.summary)}</div>
         </div>
         <button class="a-dismiss" title="dismiss" onclick="dismissAlert(${a.id})">✕</button>
-      </div>`).join('');
+      </div>`).join('')
+      + (critical.length > CRIT_SHOWN
+          ? `<a class="alert-more" href="/report">+${critical.length - CRIT_SHOWN} more critical · view full report →</a>`
+          : '');
   }catch(err){ /* leave panel as-is on a failed poll */ }
 }
 

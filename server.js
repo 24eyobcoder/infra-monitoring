@@ -35,6 +35,11 @@ app.get('/api/report', (req, res) => {
   res.json(alerts.report({ from: req.query.from, to: req.query.to }));
 });
 
+// The standalone report page.
+app.get('/report', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'report.html'));
+});
+
 // Munin webhook — receives a critical/warning alert, asks the AI layer to make it
 // human-readable, stores it so it shows on the dashboard, and returns the summary.
 app.post('/api/munin-alert', async (req, res) => {
