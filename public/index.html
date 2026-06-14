@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfraWatch — Network Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#10151e; --panel-2:#151b26; --line:#1d2531; --line-2:#2a3543;
+    --text:#e4e9f0; --dim:#7d8a9c; --faint:#4a5564;
+    --brand:#38bdf8;
+    --up:#34d399; --up-bg:rgba(52,211,153,.12);
+    --slow:#fbbf24; --slow-bg:rgba(251,191,36,.12);
+    --down:#f87171; --down-bg:rgba(248,113,113,.13);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --topbar-bg:rgba(10,14,20,.85);
+  }
+  [data-theme="light"]{
+    --bg:#f4f6f9; --panel:#ffffff; --panel-2:#eef2f7; --line:#e2e7ee; --line-2:#cbd4df;
+    --text:#1a2230; --dim:#5b6675; --faint:#9aa5b4;
+    --brand:#0284c7;
+    --up:#059669; --up-bg:rgba(5,150,105,.10);
+    --slow:#b45309; --slow-bg:rgba(217,119,6,.13);
+    --down:#dc2626; --down-bg:rgba(220,38,38,.10);
+    --topbar-bg:rgba(244,246,249,.85);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Archivo',system-ui,sans-serif;background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.4;padding-bottom:60px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* ---------- top bar ---------- */
+  .topbar{border-bottom:1px solid var(--line);background:var(--topbar-bg);
+    backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .radar{width:32px;height:32px;border-radius:8px;background:linear-gradient(145deg,#0b3a52,#0a2230);
+    border:1px solid #134b69;display:grid;place-items:center;position:relative;overflow:hidden}
+  .radar::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--brand);
+    box-shadow:0 0 0 0 rgba(56,189,248,.6);animation:ping 2.4s ease-out infinite}
+  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(56,189,248,.5)}70%{box-shadow:0 0 0 13px rgba(56,189,248,0)}100%{box-shadow:0 0 0 0 rgba(56,189,248,0)}}
+  .brand h1{font-size:16px;font-weight:600;letter-spacing:-.2px}
+  .brand .sub{font-size:11px;color:var(--faint);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase}
+  .live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);font-family:var(--mono)}
+  .live .pulse{width:7px;height:7px;border-radius:50%;background:var(--up);animation:blink 2s infinite}
+  @keyframes blink{50%{opacity:.35}}
+  .tbtn{background:var(--panel);border:1px solid var(--line);color:var(--dim);width:34px;height:34px;
+    border-radius:9px;cursor:pointer;font-size:15px;display:grid;place-items:center;transition:.15s}
+  .tbtn:hover{color:var(--text);border-color:var(--line-2)}
+  .right{display:flex;align-items:center;gap:14px}
+
+  /* ---------- banner ---------- */
+  .banner{display:flex;align-items:center;gap:12px;margin:22px 0 20px;padding:14px 18px;
+    border-radius:12px;border:1px solid var(--line);background:var(--panel);font-size:14px;font-weight:500}
+  .banner .ico{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700}
+  .banner.ok{border-color:rgba(52,211,153,.3)} .banner.ok .ico{background:var(--up-bg);color:var(--up)}
+  .banner.warn{border-color:rgba(251,191,36,.3)} .banner.warn .ico{background:var(--slow-bg);color:var(--slow)}
+  .banner.bad{border-color:rgba(248,113,113,.35);background:linear-gradient(90deg,rgba(248,113,113,.06),transparent)}
+  .banner.bad .ico{background:var(--down-bg);color:var(--down)}
+  .banner .meta{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--dim);font-weight:400}
+
+  /* ---------- summary tiles ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+  .tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--faint)}
+  .tile.t-up::before{background:var(--up)} .tile.t-slow::before{background:var(--slow)} .tile.t-down::before{background:var(--down)}
+  .tile .n{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1}
+  .tile.t-up .n{color:var(--up)} .tile.t-slow .n{color:var(--slow)} .tile.t-down .n{color:var(--down)}
+  .tile .l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;font-family:var(--mono)}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
+  .seg button{background:none;border:none;color:var(--dim);padding:8px 14px;font-size:12.5px;cursor:pointer;
+    font-family:'Archivo',sans-serif;font-weight:500;transition:.15s}
+  .seg button:hover{color:var(--text)}
+  .seg button.on{background:var(--panel-2);color:var(--text)}
+  .seg button.on.issues{color:var(--down)}
+  .search{flex:1;min-width:160px;max-width:280px}
+  .search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;
+    color:var(--text);padding:9px 12px;font-size:13px;font-family:var(--mono);outline:none;transition:.15s}
+  .search input:focus{border-color:var(--line-2)}
+  .search input::placeholder{color:var(--faint)}
+  .count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--faint)}
+
+  /* ---------- groups + cards ---------- */
+  .group{margin-bottom:26px}
+  .ghead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .ghead h2{font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim)}
+  .ghead .gline{flex:1;height:1px;background:var(--line)}
+  .ghead .gstat{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 16px;
+    transition:transform .14s ease,border-color .14s ease}
+  .card:hover{transform:translateY(-2px);border-color:var(--line-2)}
+  .card.down{border-color:rgba(248,113,113,.3);background:linear-gradient(180deg,rgba(248,113,113,.04),var(--panel))}
+  .crow{display:flex;align-items:center;gap:10px}
+  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--faint)}
+  .dot.up{background:var(--up);box-shadow:0 0 8px rgba(52,211,153,.5)}
+  .dot.slow{background:var(--slow);box-shadow:0 0 8px rgba(251,191,36,.5)}
+  .dot.down{background:var(--down);box-shadow:0 0 0 0 rgba(248,113,113,.6);animation:ping2 1.4s infinite}
+  @keyframes ping2{0%{box-shadow:0 0 0 0 rgba(248,113,113,.5)}70%{box-shadow:0 0 0 7px rgba(248,113,113,0)}100%{box-shadow:0 0 0 0 rgba(248,113,113,0)}}
+  .cname{font-weight:600;font-size:14.5px}
+  .badge{margin-left:auto;font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+    text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)}
+  .badge.up{color:var(--up);background:var(--up-bg)}
+  .badge.slow{color:var(--slow);background:var(--slow-bg)}
+  .badge.down{color:var(--down);background:var(--down-bg)}
+  .caddr{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:7px;word-break:break-all}
+  .cmetric{font-family:var(--mono);font-size:12px;color:var(--slow);margin-top:4px}
+
+  .uptime{display:flex;gap:2px;margin-top:13px;height:22px;align-items:flex-end}
+  .uptime i{flex:1;height:100%;border-radius:2px;background:var(--line-2);opacity:.5}
+  .uptime i.up{background:var(--up);opacity:.85} .uptime i.slow{background:var(--slow);opacity:.85}
+  .uptime i.down{background:var(--down);opacity:.95}
+
+  .cfoot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;
+    padding-top:11px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+  .cfoot .ms{color:var(--text)} .cfoot .ms.bad{color:var(--down)} .cfoot .ms.warn{color:var(--slow)}
+
+  .empty{text-align:center;color:var(--faint);font-family:var(--mono);font-size:13px;padding:50px 0}
+
+  .animate .card{animation:rise .4s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- AI critical issues panel ---------- */
+  .alerts{margin:22px 0 4px;display:none}
+  .alerts.show{display:block}
+  .alerts-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .alerts-head h2{font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--down)}
+  .alerts-head .ai-tag{font-family:var(--mono);font-size:10px;color:var(--brand);border:1px solid var(--line-2);
+    padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+  .alerts-head .gline{flex:1;height:1px;background:var(--line)}
+  .alert{display:flex;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden}
+  .alert::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--down)}
+  .alert.warning::before{background:var(--slow)}
+  .alert .sev{flex-shrink:0;font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
+    letter-spacing:.5px;padding:4px 9px;border-radius:20px;height:fit-content;color:var(--down);background:var(--down-bg)}
+  .alert.warning .sev{color:var(--slow);background:var(--slow-bg)}
+  .alert .body{flex:1;min-width:0}
+  .alert .a-top{display:flex;align-items:baseline;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+  .alert .a-host{font-weight:600;font-size:13.5px;font-family:var(--mono)}
+  .alert .a-title{font-size:12px;color:var(--dim)}
+  .alert .a-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .alert .a-summary{font-size:13.5px;line-height:1.5;color:var(--text)}
+  .alert .a-dismiss{flex-shrink:0;background:none;border:1px solid var(--line);color:var(--faint);
+    width:24px;height:24px;border-radius:7px;cursor:pointer;font-size:13px;line-height:1;transition:.15s}
+  .alert .a-dismiss:hover{color:var(--down);border-color:var(--line-2)}
+
+  @media(max-width:680px){.tiles{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div class="brand">
+    <div class="radar"></div>
+    <div>
+      <h1>InfraWatch</h1>
+      <div class="sub">Network Operations</div>
+    </div>
+  </div>
+  <div class="right">
+    <button class="tbtn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle light/dark theme">☀</button>
+    <div class="live"><span class="pulse"></span><span id="live">connecting…</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="banner" id="banner"><span class="ico">·</span><span id="banner-text">Loading status…</span><span class="meta" id="banner-meta"></span></div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="alerts" id="alerts">
+    <div class="alerts-head">
+      <h2>Critical Issues</h2>
+      <span class="ai-tag">AI summary</span>
+      <span class="gline"></span>
+    </div>
+    <div id="alerts-list"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="seg">
+      <button id="f-all" class="on" onclick="setFilter('all')">All</button>
+      <button id="f-issues" class="issues" onclick="setFilter('issues')">Issues only</button>
+    </div>
+    <div class="search"><input id="search" type="text" placeholder="search name or ip…" oninput="onSearch(this.value)"></div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div id="board"></div>
+</div>
+
+<script>
+// ---- theme (light / dark) ----
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  try{ localStorage.setItem('iw-theme', t); }catch(e){}
+  const btn = document.getElementById('theme-btn');
+  if(btn) btn.textContent = (t === 'light') ? '☾' : '☀';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+}
+(function(){ let saved; try{ saved = localStorage.getItem('iw-theme'); }catch(e){} applyTheme(saved || 'dark'); })();
+
+const LABEL = { up:'Online', slow:'Degraded', down:'Offline' };
+const MAX = 30;                 // how many recent checks each uptime bar shows
+const history = {};             // device name -> array of past statuses
+let lastDevices = [];           // most recent fetch
+let filter = 'all';
+let query = '';
+let firstPaint = true;
+
+// ---- helpers ----
+function timeAgo(iso){
+  if(!iso) return '—';
+  const s = Math.round((Date.now() - new Date(iso))/1000);
+  if(s < 5) return 'just now';
+  if(s < 60) return s + 's ago';
+  if(s < 3600) return Math.floor(s/60) + 'm ago';
+  return Math.floor(s/3600) + 'h ago';
+}
+function uptimePct(name){
+  const h = history[name] || [];
+  if(!h.length) return '—';
+  const ok = h.filter(s => s !== 'down').length;
+  return Math.round(ok / h.length * 100) + '%';
+}
+function barsHtml(name){
+  const h = history[name] || [];
+  const pad = Math.max(0, MAX - h.length);     // empty slots on the left
+  let out = '';
+  for(let i=0;i<pad;i++) out += '<i></i>';
+  for(const s of h.slice(-MAX)) out += '<i class="'+s+'"></i>';
+  return out;
+}
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ---- fetch loop ----
+async function load(){
+  try{
+    const res = await fetch('/api/status');
+    const devices = await res.json();
+    devices.forEach(d => {                       // remember this check for the uptime bar
+      (history[d.name] = history[d.name] || []).push(d.status);
+      if(history[d.name].length > MAX) history[d.name].shift();
+    });
+    lastDevices = devices;
+    document.getElementById('live').textContent = 'live · ' + new Date().toLocaleTimeString();
+    paint();
+  }catch(err){
+    document.getElementById('live').textContent = 'connection lost';
+  }
+  loadAlerts();
+}
+
+// ---- AI critical issues panel ----
+async function loadAlerts(){
+  try{
+    const res = await fetch('/api/alerts');
+    const list = await res.json();
+    const panel = document.getElementById('alerts');
+    const box = document.getElementById('alerts-list');
+    panel.classList.toggle('show', list.length > 0);
+    box.innerHTML = list.map(a => `
+      <div class="alert ${esc(a.severity)}">
+        <span class="sev">${esc(a.severity)}</span>
+        <div class="body">
+          <div class="a-top">
+            <span class="a-host">${esc(a.host)}</span>
+            <span class="a-title">${esc(a.title)}</span>
+            <span class="a-time">${timeAgo(a.time)}</span>
+          </div>
+          <div class="a-summary">${esc(a.summary)}</div>
+        </div>
+        <button class="a-dismiss" title="dismiss" onclick="dismissAlert(${a.id})">✕</button>
+      </div>`).join('');
+  }catch(err){ /* leave panel as-is on a failed poll */ }
+}
+
+async function dismissAlert(id){
+  try{ await fetch('/api/alerts/' + id, { method: 'DELETE' }); }catch(e){}
+  loadAlerts();
+}
+
+// ---- render everything from lastDevices + current filter/search ----
+function paint(){
+  const devices = lastDevices;
+  const count = s => devices.filter(d => d.status === s).length;
+  const down = count('down'), slow = count('slow'), up = count('up');
+
+  // banner
+  const banner = document.getElementById('banner');
+  const bt = document.getElementById('banner-text');
+  const ico = banner.querySelector('.ico');
+  if(down > 0){ banner.className='banner bad'; ico.textContent='!'; bt.textContent = down+' system'+(down>1?'s':'')+' offline'; }
+  else if(slow > 0){ banner.className='banner warn'; ico.textContent='~'; bt.textContent = slow+' system'+(slow>1?'s':'')+' degraded'; }
+  else { banner.className='banner ok'; ico.textContent='✓'; bt.textContent='All systems operational'; }
+  document.getElementById('banner-meta').textContent = devices.length + ' monitored';
+
+  // tiles
+  document.getElementById('tiles').innerHTML = `
+    <div class="tile"><div class="n">${devices.length}</div><div class="l">Total</div></div>
+    <div class="tile t-up"><div class="n">${up}</div><div class="l">Online</div></div>
+    <div class="tile t-slow"><div class="n">${slow}</div><div class="l">Degraded</div></div>
+    <div class="tile t-down"><div class="n">${down}</div><div class="l">Offline</div></div>`;
+
+  // apply filter + search
+  let shown = devices;
+  if(filter === 'issues') shown = shown.filter(d => d.status !== 'up');
+  if(query) shown = shown.filter(d =>
+    (d.name + ' ' + d.address).toLowerCase().includes(query.toLowerCase()));
+
+  document.getElementById('count').textContent = shown.length + ' / ' + devices.length + ' shown';
+
+  // group
+  const groups = {};
+  shown.forEach(d => (groups[d.group] = groups[d.group] || []).push(d));
+
+  const board = document.getElementById('board');
+  if(!shown.length){ board.className=''; board.innerHTML = '<div class="empty">no devices match</div>'; return; }
+
+  let html = '';
+  for(const g in groups){
+    const list = groups[g];
+    const gup = list.filter(d => d.status === 'up').length;
+    html += `<div class="group"><div class="ghead"><h2>${g}</h2><div class="gline"></div>`+
+            `<span class="gstat">${gup}/${list.length} up</span></div><div class="grid">`;
+    list.forEach(d => {
+      let metric = '';
+      if(d.metrics && d.metrics.battery != null)
+        metric = `<div class="cmetric">⚡ battery ${d.metrics.battery}%`+
+                 `${d.metrics.onBattery ? ' — ON BATTERY' : ''}</div>`;
+      const msClass = d.status === 'down' ? 'bad' : d.status === 'slow' ? 'warn' : '';
+      html += `
+        <div class="card ${d.status}">
+          <div class="crow">
+            <span class="dot ${d.status}"></span>
+            <span class="cname">${d.name}</span>
+            <span class="badge ${d.status}">${LABEL[d.status]}</span>
+          </div>
+          <div class="caddr">${d.address}</div>
+          ${metric}
+          <div class="uptime">${barsHtml(d.name)}</div>
+          <div class="cfoot">
+            <span>uptime ${uptimePct(d.name)}</span>
+            <span class="ms ${msClass}">${d.ms == null ? 'no response' : d.ms + ' ms'} · ${timeAgo(d.lastChecked)}</span>
+          </div>
+        </div>`;
+    });
+    html += `</div></div>`;
+  }
+  board.className = firstPaint ? 'animate' : '';
+  board.innerHTML = html;
+  firstPaint = false;
+}
+
+// ---- toolbar controls (don't refetch, just repaint) ----
+function setFilter(f){
+  filter = f;
+  document.getElementById('f-all').classList.toggle('on', f === 'all');
+  document.getElementById('f-issues').classList.toggle('on', f === 'issues');
+  paint();
+}
+function onSearch(v){ query = v; paint(); }
+
+// ---- go ----
+load();
+setInterval(load, 10000);
+</script>
+</body>
+</html>
