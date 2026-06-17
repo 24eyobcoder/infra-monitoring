@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfraWatch — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1322; --panel:#171a27; --panel-2:#1d2132; --card:linear-gradient(180deg,#1a1e2e,#15182438);
+    --line:#262b3d; --line-2:#343b52;
+    --text:#edeefb; --dim:#9ba2c0; --faint:#646b8a;
+    --accent:#4f8df5; --accent-2:#f5a01e; --accent-soft:rgba(79,141,245,.15);
+    --up:#3ecf8e; --up-bg:rgba(62,207,142,.14);
+    --down:#f56b78; --down-bg:rgba(245,107,120,.15); --down-line:rgba(245,107,120,.38);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --display:'Sora','Inter',system-ui,sans-serif;
+    --shadow:0 18px 50px -20px rgba(0,0,0,.7);
+    --radius:16px; --radius-sm:11px;
+  }
+  [data-theme="light"]{
+    --bg:#eef2fb; --panel:#ffffff; --panel-2:#eff1fa; --card:linear-gradient(180deg,#ffffff,#fbfcff);
+    --line:#e8eaf4; --line-2:#d6dae9;
+    --text:#1b2138; --dim:#5a6388; --faint:#9298b6;
+    --accent:#1f57b6; --accent-2:#ef9412; --accent-soft:rgba(31,87,182,.1);
+    --up:#10a368; --up-bg:rgba(16,163,104,.1);
+    --down:#e0535f; --down-bg:rgba(224,83,95,.1); --down-line:rgba(224,83,95,.28);
+    --shadow:0 24px 60px -24px rgba(40,46,90,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh;
+    display:grid;place-items:center;padding:24px}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(820px 480px at 15% -10%, var(--accent-soft), transparent 70%),
+      radial-gradient(720px 440px at 100% 110%, rgba(245,160,30,.10), transparent 65%);}
+
+  .login{width:100%;max-width:400px}
+  .head{text-align:center;margin-bottom:26px}
+  .mark{width:56px;height:56px;margin:0 auto 16px;display:grid;place-items:center}
+  .mark svg{width:56px;height:56px;display:block}
+  .tagline{font-family:var(--mono);font-size:11px;color:var(--accent-2);letter-spacing:.3px;margin-top:9px}
+  .head h1{font-family:var(--display);font-size:21px;font-weight:600;letter-spacing:-.4px}
+  .head p{font-size:13px;color:var(--dim);margin-top:6px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:26px 26px 24px;box-shadow:var(--shadow)}
+  label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--dim);margin:0 0 7px}
+  .field{margin-bottom:16px}
+  input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+    color:var(--text);padding:12px 14px;font-size:14px;font-family:inherit;outline:none;transition:.15s}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  input::placeholder{color:var(--faint)}
+
+  .err{display:none;align-items:center;gap:9px;font-size:13px;color:var(--down);
+    background:var(--down-bg);border:1px solid var(--down-line);border-radius:var(--radius-sm);
+    padding:11px 13px;margin-bottom:16px}
+  .err.show{display:flex}
+
+  .btn{width:100%;border:none;cursor:pointer;font-family:var(--display);font-weight:600;font-size:14.5px;
+    color:#fff;padding:13px;border-radius:var(--radius-sm);
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:0 8px 20px -8px var(--accent-soft);transition:transform .14s,filter .14s}
+  .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+  .alt{text-align:center;margin-top:18px;font-size:13px;color:var(--dim);display:none}
+  .alt.show{display:block}
+  .alt a{color:var(--accent);font-weight:600;text-decoration:none}
+  .alt a:hover{text-decoration:underline}
+  .foot{text-align:center;margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+</style>
+</head>
+<body>
+  <div class="login">
+    <div class="head">
+      <div class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19.5" fill="none" stroke="#1f57b6" stroke-width="5.5"/><rect x="11.5" y="12.8" width="25" height="6.4" rx="1.6" fill="#f5a01e"/><rect x="20.8" y="17" width="6.4" height="18" rx="1.6" fill="#1f57b6"/></svg></div>
+      <h1>Welcome to InfraWatch</h1>
+      <p>Sign in to access the operations dashboard</p>
+      <div class="tagline">ethical · ethiopian · end-to-end</div>
+    </div>
+
+    <form class="card" id="form" autocomplete="on">
+      <div class="err" id="err"><span>⚠</span><span id="err-text"></span></div>
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" placeholder="admin" autocomplete="username" autofocus required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button class="btn" id="submit" type="submit">Sign in</button>
+    </form>
+
+    <div class="alt" id="alt">New here? <a href="/signup">Create an account</a></div>
+    <div class="foot">InfraWatch · Network Operations</div>
+  </div>
+
+<script>
+// match whatever theme the user picked on the dashboard
+(function(){ let t; try{ t = localStorage.getItem('iw-theme'); }catch(e){}
+  document.documentElement.setAttribute('data-theme', t || 'dark'); })();
+
+// Only show the "Create an account" link if self-registration is enabled.
+(async function(){
+  try{
+    const res = await fetch('/api/signup-status');
+    const { enabled } = await res.json();
+    if(enabled) document.getElementById('alt').classList.add('show');
+  }catch(e){}
+})();
+
+const form = document.getElementById('form');
+const errBox = document.getElementById('err');
+const errText = document.getElementById('err-text');
+const btn = document.getElementById('submit');
+
+function showError(msg){ errText.textContent = msg; errBox.classList.add('show'); }
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errBox.classList.remove('show');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try{
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if(res.ok && data.ok){
+      window.location = '/';
+      return;
+    }
+    showError(data.error || 'Sign in failed. Please try again.');
+  }catch(err){
+    showError('Could not reach the server. Check your connection.');
+  }
+  btn.disabled = false; btn.textContent = 'Sign in';
+});
+</script>
+</body>
+</html>

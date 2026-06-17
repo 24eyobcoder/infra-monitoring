@@ -23,10 +23,14 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);
 `);
 
+// Add the AI category column to databases created before this feature (idempotent —
+// the ALTER throws "duplicate column" once it exists, which we safely ignore).
+try { db.exec('ALTER TABLE alerts ADD COLUMN category TEXT'); } catch (_) {}
+
 // ---- prepared statements ----
 const stmtInsert = db.prepare(`
-  INSERT INTO alerts (severity, host, title, problems, raw, summary, created_at)
-  VALUES (@severity, @host, @title, @problems, @raw, @summary, @created_at)
+  INSERT INTO alerts (severity, host, title, problems, raw, summary, category, created_at)
+  VALUES (@severity, @host, @title, @problems, @raw, @summary, @category, @created_at)
 `);
 const stmtActive  = db.prepare(`SELECT * FROM alerts WHERE dismissed = 0 ORDER BY id DESC LIMIT ?`);
 const stmtById    = db.prepare(`SELECT * FROM alerts WHERE id = ?`);
@@ -47,6 +51,7 @@ function rowToAlert(row) {
     problems,
     raw: row.raw,
     summary: row.summary,
+    category: row.category || null,
     time: row.created_at,
     dismissed: !!row.dismissed,
   };
@@ -60,6 +65,7 @@ function insert(alert) {
     problems: JSON.stringify(Array.isArray(alert.problems) ? alert.problems : []),
     raw: alert.raw || '',
     summary: alert.summary || '',
+    category: alert.category || null,
     created_at: alert.time || new Date().toISOString(),
   });
   return rowToAlert(stmtById.get(info.lastInsertRowid));

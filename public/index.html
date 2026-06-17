@@ -3,202 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InfraWatch — Network Operations</title>
+<title>InfraWatch — Overview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0e14; --panel:#10151e; --panel-2:#151b26; --line:#1d2531; --line-2:#2a3543;
-    --text:#e4e9f0; --dim:#7d8a9c; --faint:#4a5564;
-    --brand:#38bdf8;
-    --up:#34d399; --up-bg:rgba(52,211,153,.12);
-    --slow:#fbbf24; --slow-bg:rgba(251,191,36,.12);
-    --down:#f87171; --down-bg:rgba(248,113,113,.13);
+    /* dark — deep indigo-navy, warm indigo accent, friendly status hues */
+    --bg:#0b1322; --panel:#171a27; --panel-2:#1d2132; --card:linear-gradient(180deg,#1a1e2e,#15182438);
+    --line:#262b3d; --line-2:#343b52;
+    --text:#edeefb; --dim:#9ba2c0; --faint:#646b8a;
+    --accent:#4f8df5; --accent-2:#f5a01e; --accent-soft:rgba(79,141,245,.15);
+    --up:#3ecf8e; --up-bg:rgba(62,207,142,.14); --up-line:rgba(62,207,142,.34);
+    --slow:#f0b144; --slow-bg:rgba(240,177,68,.14); --slow-line:rgba(240,177,68,.34);
+    --down:#f56b78; --down-bg:rgba(245,107,120,.15); --down-line:rgba(245,107,120,.38);
     --mono:'JetBrains Mono',ui-monospace,monospace;
-    --topbar-bg:rgba(10,14,20,.85);
+    --display:'Sora','Inter',system-ui,sans-serif;
+    --shadow:0 4px 16px -6px rgba(0,0,0,.5);
+    --shadow-sm:0 1px 3px rgba(0,0,0,.3);
+    --radius:16px; --radius-sm:11px;
   }
   [data-theme="light"]{
-    --bg:#f4f6f9; --panel:#ffffff; --panel-2:#eef2f7; --line:#e2e7ee; --line-2:#cbd4df;
-    --text:#1a2230; --dim:#5b6675; --faint:#9aa5b4;
-    --brand:#0284c7;
-    --up:#059669; --up-bg:rgba(5,150,105,.10);
-    --slow:#b45309; --slow-bg:rgba(217,119,6,.13);
-    --down:#dc2626; --down-bg:rgba(220,38,38,.10);
-    --topbar-bg:rgba(244,246,249,.85);
+    --bg:#eef2fb; --panel:#ffffff; --panel-2:#eff1fa; --card:linear-gradient(180deg,#ffffff,#fbfcff);
+    --line:#e8eaf4; --line-2:#d6dae9;
+    --text:#1b2138; --dim:#5a6388; --faint:#9298b6;
+    --accent:#1f57b6; --accent-2:#ef9412; --accent-soft:rgba(31,87,182,.1);
+    --up:#10a368; --up-bg:rgba(16,163,104,.1); --up-line:rgba(16,163,104,.26);
+    --slow:#bd7d09; --slow-bg:rgba(189,125,9,.11); --slow-line:rgba(189,125,9,.28);
+    --down:#e0535f; --down-bg:rgba(224,83,95,.1); --down-line:rgba(224,83,95,.28);
+    --shadow:0 6px 20px -10px rgba(40,46,90,.28);
+    --shadow-sm:0 1px 3px rgba(40,46,90,.07);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Archivo',system-ui,sans-serif;background:var(--bg);color:var(--text);
-    -webkit-font-smoothing:antialiased;line-height:1.4;padding-bottom:60px}
-  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.5;padding-bottom:72px;transition:background .25s,color .25s}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(880px 520px at 6% -12%, rgba(79,141,245,.20), transparent 70%),
+      radial-gradient(760px 460px at 102% -6%, rgba(245,160,30,.14), transparent 65%),
+      radial-gradient(680px 460px at 55% 116%, rgba(31,87,182,.12), transparent 72%);}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+  a{text-decoration:none;color:inherit}
 
   /* ---------- top bar ---------- */
-  .topbar{border-bottom:1px solid var(--line);background:var(--topbar-bg);
-    backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
-  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .topbar{border-bottom:3px solid #f5a01e;background:linear-gradient(180deg,#2059bb,#1a4ea3);
+    position:sticky;top:0;z-index:10;box-shadow:0 2px 14px -4px rgba(0,0,0,.4)}
+  .topbar .wrap{display:flex;align-items:center;gap:22px;height:64px}
   .brand{display:flex;align-items:center;gap:12px}
-  .radar{width:32px;height:32px;border-radius:8px;background:linear-gradient(145deg,#0b3a52,#0a2230);
-    border:1px solid #134b69;display:grid;place-items:center;position:relative;overflow:hidden}
-  .radar::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--brand);
-    box-shadow:0 0 0 0 rgba(56,189,248,.6);animation:ping 2.4s ease-out infinite}
-  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(56,189,248,.5)}70%{box-shadow:0 0 0 13px rgba(56,189,248,0)}100%{box-shadow:0 0 0 0 rgba(56,189,248,0)}}
-  .brand h1{font-size:16px;font-weight:600;letter-spacing:-.2px}
-  .brand .sub{font-size:11px;color:var(--faint);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase}
-  .live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);font-family:var(--mono)}
-  .live .pulse{width:7px;height:7px;border-radius:50%;background:var(--up);animation:blink 2s infinite}
-  @keyframes blink{50%{opacity:.35}}
-  .tbtn{background:var(--panel);border:1px solid var(--line);color:var(--dim);width:34px;height:34px;
-    border-radius:9px;cursor:pointer;font-size:15px;display:grid;place-items:center;transition:.15s}
-  .tbtn:hover{color:var(--text);border-color:var(--line-2)}
-  .right{display:flex;align-items:center;gap:14px}
+  .mark{width:36px;height:36px;display:grid;place-items:center;background:#fff;border-radius:10px;box-shadow:0 2px 8px -2px rgba(0,0,0,.3)}
+  .mark svg{width:27px;height:27px;display:block}
+  .brand h1{font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:-.3px;color:#fff}
+  .brand .sub{font-size:10.5px;color:rgba(255,255,255,.6);letter-spacing:.5px;text-transform:uppercase;font-weight:500}
+  .nav{display:flex;gap:4px;margin-left:8px}
+  .nav a{font-size:13.5px;color:rgba(255,255,255,.82);font-weight:500;padding:7px 13px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:#fff;background:rgba(255,255,255,.14)}
+  .nav a.on{color:#0e1018;background:#f5a01e}
+  .right{display:flex;align-items:center;gap:14px;margin-left:auto}
+  .live{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.78);font-family:var(--mono)}
+  .live .pulse{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.28);animation:blink 2.4s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.45}}
+  .tbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;width:34px;height:34px;
+    border-radius:10px;cursor:pointer;font-size:14px;display:grid;place-items:center;transition:.15s}
+  .tbtn:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.22)}
 
-  /* ---------- banner ---------- */
-  .banner{display:flex;align-items:center;gap:12px;margin:22px 0 20px;padding:14px 18px;
-    border-radius:12px;border:1px solid var(--line);background:var(--panel);font-size:14px;font-weight:500}
-  .banner .ico{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700}
-  .banner.ok{border-color:rgba(52,211,153,.3)} .banner.ok .ico{background:var(--up-bg);color:var(--up)}
-  .banner.warn{border-color:rgba(251,191,36,.3)} .banner.warn .ico{background:var(--slow-bg);color:var(--slow)}
-  .banner.bad{border-color:rgba(248,113,113,.35);background:linear-gradient(90deg,rgba(248,113,113,.06),transparent)}
-  .banner.bad .ico{background:var(--down-bg);color:var(--down)}
-  .banner .meta{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--dim);font-weight:400}
+  /* ---------- hero banner ---------- */
+  .banner{display:flex;align-items:center;gap:15px;margin:28px 0 26px;padding:22px 24px;
+    border-radius:20px;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .banner::after{content:'';position:absolute;right:-40px;top:-60px;width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle,currentColor,transparent 65%);opacity:.10}
+  .banner .ico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;
+    font-size:20px;font-weight:700;flex-shrink:0;color:#fff}
+  .banner .htxt h2{font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:-.3px}
+  .banner .htxt p{font-size:13px;color:var(--dim);margin-top:3px}
+  .banner .meta{margin-left:auto;text-align:right;font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .banner.ok{color:var(--up);background:linear-gradient(105deg,var(--up-bg),transparent 55%),var(--card);border-color:var(--up-line)}
+  .banner.warn{color:var(--slow);background:linear-gradient(105deg,var(--slow-bg),transparent 55%),var(--card);border-color:var(--slow-line)}
+  .banner.bad{color:var(--down);background:linear-gradient(105deg,var(--down-bg),transparent 55%),var(--card);border-color:var(--down-line)}
+  .banner .ico.ok{background:linear-gradient(140deg,#10b981,#34d399)}
+  .banner .ico.warn{background:linear-gradient(140deg,#f59e0b,#fbbf24)}
+  .banner .ico.bad{background:linear-gradient(140deg,#ef4444,#fb7185)}
+  .banner .htxt h2{color:var(--text)}
 
-  /* ---------- summary tiles ---------- */
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-  .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
-  .tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--faint)}
-  .tile.t-up::before{background:var(--up)} .tile.t-slow::before{background:var(--slow)} .tile.t-down::before{background:var(--down)}
-  .tile .n{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1}
-  .tile.t-up .n{color:var(--up)} .tile.t-slow .n{color:var(--slow)} .tile.t-down .n{color:var(--down)}
-  .tile .l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;font-family:var(--mono)}
+  /* ---------- colorful stat tiles ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+  .stat{border-radius:18px;padding:20px 22px;color:#fff;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);transition:transform .16s ease,box-shadow .16s ease}
+  .stat:hover{transform:translateY(-3px)}
+  .stat::after{content:'';position:absolute;right:-30px;bottom:-46px;width:140px;height:140px;border-radius:50%;
+    background:rgba(255,255,255,.16)}
+  .stat .n{font-family:var(--display);font-size:40px;font-weight:700;line-height:1;letter-spacing:-1.5px}
+  .stat .l{font-size:12px;margin-top:10px;font-weight:600;letter-spacing:.4px;opacity:.92;position:relative;z-index:1}
+  .stat.total{background:linear-gradient(135deg,#1f57b6,#3f86e8)}
+  .stat.online{background:linear-gradient(135deg,#0ea371,#34d399)}
+  .stat.degraded{background:linear-gradient(135deg,#e08c0b,#fbbf24)}
+  .stat.offline{background:linear-gradient(135deg,#e11d48,#fb7185)}
 
-  /* ---------- toolbar ---------- */
-  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
-  .seg button{background:none;border:none;color:var(--dim);padding:8px 14px;font-size:12.5px;cursor:pointer;
-    font-family:'Archivo',sans-serif;font-weight:500;transition:.15s}
-  .seg button:hover{color:var(--text)}
-  .seg button.on{background:var(--panel-2);color:var(--text)}
-  .seg button.on.issues{color:var(--down)}
-  .search{flex:1;min-width:160px;max-width:280px}
-  .search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;
-    color:var(--text);padding:9px 12px;font-size:13px;font-family:var(--mono);outline:none;transition:.15s}
-  .search input:focus{border-color:var(--line-2)}
-  .search input::placeholder{color:var(--faint)}
-  .count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  /* ---------- section heading ---------- */
+  .shead{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+  .shead h3{font-family:var(--display);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--dim)}
+  .shead .gline{flex:1;height:1px;background:var(--line)}
+  .shead a.more{font-family:var(--mono);font-size:12px;color:var(--accent)}
+  .shead a.more:hover{text-decoration:underline}
 
-  /* ---------- groups + cards ---------- */
-  .group{margin-bottom:26px}
-  .ghead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .ghead h2{font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim)}
-  .ghead .gline{flex:1;height:1px;background:var(--line)}
-  .ghead .gstat{font-family:var(--mono);font-size:11px;color:var(--faint)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 16px;
-    transition:transform .14s ease,border-color .14s ease}
-  .card:hover{transform:translateY(-2px);border-color:var(--line-2)}
-  .card.down{border-color:rgba(248,113,113,.3);background:linear-gradient(180deg,rgba(248,113,113,.04),var(--panel))}
-  .crow{display:flex;align-items:center;gap:10px}
-  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--faint)}
-  .dot.up{background:var(--up);box-shadow:0 0 8px rgba(52,211,153,.5)}
-  .dot.slow{background:var(--slow);box-shadow:0 0 8px rgba(251,191,36,.5)}
-  .dot.down{background:var(--down);box-shadow:0 0 0 0 rgba(248,113,113,.6);animation:ping2 1.4s infinite}
-  @keyframes ping2{0%{box-shadow:0 0 0 0 rgba(248,113,113,.5)}70%{box-shadow:0 0 0 7px rgba(248,113,113,0)}100%{box-shadow:0 0 0 0 rgba(248,113,113,0)}}
-  .cname{font-weight:600;font-size:14.5px}
-  .badge{margin-left:auto;font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;
-    text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)}
-  .badge.up{color:var(--up);background:var(--up-bg)}
-  .badge.slow{color:var(--slow);background:var(--slow-bg)}
-  .badge.down{color:var(--down);background:var(--down-bg)}
-  .caddr{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:7px;word-break:break-all}
-  .cmetric{font-family:var(--mono);font-size:12px;color:var(--slow);margin-top:4px}
-
-  .uptime{display:flex;gap:2px;margin-top:13px;height:22px;align-items:flex-end}
-  .uptime i{flex:1;height:100%;border-radius:2px;background:var(--line-2);opacity:.5}
-  .uptime i.up{background:var(--up);opacity:.85} .uptime i.slow{background:var(--slow);opacity:.85}
-  .uptime i.down{background:var(--down);opacity:.95}
-
-  .cfoot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;
-    padding-top:11px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--faint)}
-  .cfoot .ms{color:var(--text)} .cfoot .ms.bad{color:var(--down)} .cfoot .ms.warn{color:var(--slow)}
-
-  .empty{text-align:center;color:var(--faint);font-family:var(--mono);font-size:13px;padding:50px 0}
-
-  .animate .card{animation:rise .4s ease both}
-  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* ---------- group health cards ---------- */
+  .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:34px}
+  .gcard{display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+  .gcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--up)}
+  .gcard.warn::before{background:var(--slow)} .gcard.bad::before{background:var(--down)}
+  .gcard:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:var(--shadow)}
+  .gcard .gtop{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .gcard .gname{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:-.2px}
+  .gcard .gpill{margin-left:auto;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:20px;
+    text-transform:uppercase;letter-spacing:.4px}
+  .gcard.ok .gpill{color:var(--up);background:var(--up-bg)}
+  .gcard.warn .gpill{color:var(--slow);background:var(--slow-bg)}
+  .gcard.bad .gpill{color:var(--down);background:var(--down-bg)}
+  .gcard .gbar{height:8px;border-radius:6px;background:var(--panel-2);overflow:hidden;display:flex}
+  .gcard .gbar i{height:100%}
+  .gcard .gbar i.up{background:var(--up)} .gcard .gbar i.slow{background:var(--slow)} .gcard .gbar i.down{background:var(--down)}
+  .gcard .gfoot{display:flex;gap:14px;margin-top:13px;font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+  .gcard .gfoot b{color:var(--text);font-weight:600}
+  .gcard .gfoot .s-up b{color:var(--up)} .gcard .gfoot .s-slow b{color:var(--slow)} .gcard .gfoot .s-down b{color:var(--down)}
 
   /* ---------- AI critical issues panel ---------- */
-  .alerts{margin:22px 0 4px;display:none}
+  .alerts{display:none}
   .alerts.show{display:block}
-  .alerts-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .alerts-head h2{font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--down)}
-  .alerts-head .ai-tag{font-family:var(--mono);font-size:10px;color:var(--brand);border:1px solid var(--line-2);
-    padding:2px 7px;border-radius:20px;letter-spacing:.5px}
-  .alerts-head .gline{flex:1;height:1px;background:var(--line)}
-  .alert{display:flex;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
-    padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden}
-  .alert::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--down)}
-  .alert.warning::before{background:var(--slow)}
+  .alerts .shead h3{color:var(--down)}
+  .alerts .ai-tag{font-family:var(--mono);font-size:10px;color:var(--accent);background:var(--accent-soft);
+    padding:3px 9px;border-radius:20px;letter-spacing:.4px}
+  .alert{display:flex;gap:14px;background:var(--card);border:1px solid var(--line);
+    border-left:3px solid var(--down);border-radius:var(--radius);padding:16px 18px;margin-bottom:11px;box-shadow:var(--shadow-sm)}
+  .alert.warning{border-left-color:var(--slow)}
   .alert .sev{flex-shrink:0;font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;
-    letter-spacing:.5px;padding:4px 9px;border-radius:20px;height:fit-content;color:var(--down);background:var(--down-bg)}
+    letter-spacing:.4px;padding:5px 10px;border-radius:20px;height:fit-content;color:var(--down);background:var(--down-bg)}
   .alert.warning .sev{color:var(--slow);background:var(--slow-bg)}
   .alert .body{flex:1;min-width:0}
-  .alert .a-top{display:flex;align-items:baseline;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+  .alert .a-top{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
   .alert .a-host{font-weight:600;font-size:13.5px;font-family:var(--mono)}
+  .alert .a-cat{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.4px;
+    text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:20px}
   .alert .a-title{font-size:12px;color:var(--dim)}
   .alert .a-time{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint)}
-  .alert .a-summary{font-size:13.5px;line-height:1.5;color:var(--text)}
+  .alert .a-summary{font-size:13.5px;line-height:1.55;color:var(--text)}
   .alert .a-dismiss{flex-shrink:0;background:none;border:1px solid var(--line);color:var(--faint);
-    width:24px;height:24px;border-radius:7px;cursor:pointer;font-size:13px;line-height:1;transition:.15s}
-  .alert .a-dismiss:hover{color:var(--down);border-color:var(--line-2)}
+    width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:13px;line-height:1;transition:.15s}
+  .alert .a-dismiss:hover{color:var(--down);border-color:var(--down-line);background:var(--down-bg)}
   .alert-more{display:block;text-align:center;font-family:var(--mono);font-size:12px;color:var(--dim);
-    text-decoration:none;padding:8px;border:1px dashed var(--line-2);border-radius:10px;transition:.15s}
-  .alert-more:hover{color:var(--text);border-color:var(--brand)}
+    padding:10px;border:1px dashed var(--line-2);border-radius:var(--radius-sm);transition:.15s}
+  .alert-more:hover{color:var(--accent);border-color:var(--accent)}
 
-  @media(max-width:680px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  .empty{text-align:center;color:var(--faint);font-family:var(--mono);font-size:13px;padding:40px 0}
+
+  @media(max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}.nav{display:none}}
 </style>
 </head>
 <body>
 
 <div class="topbar"><div class="wrap">
   <div class="brand">
-    <div class="radar"></div>
+    <div class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19.5" fill="none" stroke="#1f57b6" stroke-width="5.5"/><rect x="11.5" y="12.8" width="25" height="6.4" rx="1.6" fill="#f5a01e"/><rect x="20.8" y="17" width="6.4" height="18" rx="1.6" fill="#1f57b6"/></svg></div>
     <div>
       <h1>InfraWatch</h1>
       <div class="sub">Network Operations</div>
     </div>
   </div>
+  <nav class="nav">
+    <a href="/" class="on">Overview</a>
+    <a href="/devices">Devices</a>
+    <a href="/report">Report</a>
+  </nav>
   <div class="right">
-    <a class="navlink" href="/report" style="font-size:13px;color:var(--dim);font-family:var(--mono)">Report →</a>
     <button class="tbtn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle light/dark theme">☀</button>
+    <button class="tbtn" id="logout-btn" onclick="logout()" title="Log out" aria-label="Log out">⏻</button>
     <div class="live"><span class="pulse"></span><span id="live">connecting…</span></div>
   </div>
 </div></div>
 
 <div class="wrap">
-  <div class="banner" id="banner"><span class="ico">·</span><span id="banner-text">Loading status…</span><span class="meta" id="banner-meta"></span></div>
+  <div class="banner ok" id="banner">
+    <span class="ico ok" id="banner-ico">·</span>
+    <div class="htxt"><h2 id="banner-text">Loading status…</h2><p id="banner-sub">Fetching the latest health check</p></div>
+    <div class="meta" id="banner-meta"></div>
+  </div>
 
   <div class="tiles" id="tiles"></div>
 
   <div class="alerts" id="alerts">
-    <div class="alerts-head">
-      <h2>Critical Issues</h2>
+    <div class="shead">
+      <h3>Critical Issues</h3>
       <span class="ai-tag">AI summary</span>
       <span class="gline"></span>
     </div>
     <div id="alerts-list"></div>
   </div>
 
-  <div class="toolbar">
-    <div class="seg">
-      <button id="f-all" class="on" onclick="setFilter('all')">All</button>
-      <button id="f-issues" class="issues" onclick="setFilter('issues')">Issues only</button>
-    </div>
-    <div class="search"><input id="search" type="text" placeholder="search name or ip…" oninput="onSearch(this.value)"></div>
-    <div class="count" id="count"></div>
+  <div class="shead">
+    <h3>Health by group</h3>
+    <span class="gline"></span>
+    <a class="more" href="/devices">All devices →</a>
   </div>
-
-  <div id="board"></div>
+  <div class="groups" id="groups"></div>
 </div>
 
 <script>
@@ -215,15 +221,16 @@ function toggleTheme(){
 }
 (function(){ let saved; try{ saved = localStorage.getItem('iw-theme'); }catch(e){} applyTheme(saved || 'dark'); })();
 
-const LABEL = { up:'Online', slow:'Degraded', down:'Offline' };
-const MAX = 30;                 // how many recent checks each uptime bar shows
-const history = {};             // device name -> array of past statuses
-let lastDevices = [];           // most recent fetch
-let filter = 'all';
-let query = '';
-let firstPaint = true;
+let lastDevices = [];
 
-// ---- helpers ----
+// ---- session ----
+async function logout(){
+  try{ await fetch('/api/logout', { method: 'POST' }); }catch(e){}
+  window.location = '/login';
+}
+// If a fetch comes back 401 the session has expired — bounce to the login page.
+function guard(res){ if(res.status === 401){ window.location = '/login'; return false; } return true; }
+
 function timeAgo(iso){
   if(!iso) return '—';
   const s = Math.round((Date.now() - new Date(iso))/1000);
@@ -232,21 +239,6 @@ function timeAgo(iso){
   if(s < 3600) return Math.floor(s/60) + 'm ago';
   return Math.floor(s/3600) + 'h ago';
 }
-function uptimePct(name){
-  const h = history[name] || [];
-  if(!h.length) return '—';
-  const ok = h.filter(s => s !== 'down').length;
-  return Math.round(ok / h.length * 100) + '%';
-}
-function barsHtml(name){
-  const h = history[name] || [];
-  const pad = Math.max(0, MAX - h.length);     // empty slots on the left
-  let out = '';
-  for(let i=0;i<pad;i++) out += '<i></i>';
-  for(const s of h.slice(-MAX)) out += '<i class="'+s+'"></i>';
-  return out;
-}
-
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -254,12 +246,8 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
 async function load(){
   try{
     const res = await fetch('/api/status');
-    const devices = await res.json();
-    devices.forEach(d => {                       // remember this check for the uptime bar
-      (history[d.name] = history[d.name] || []).push(d.status);
-      if(history[d.name].length > MAX) history[d.name].shift();
-    });
-    lastDevices = devices;
+    if(!guard(res)) return;
+    lastDevices = await res.json();
     document.getElementById('live').textContent = 'live · ' + new Date().toLocaleTimeString();
     paint();
   }catch(err){
@@ -268,24 +256,84 @@ async function load(){
   loadAlerts();
 }
 
-// ---- AI critical issues panel ----
-const CRIT_SHOWN = 3; // home page shows only the most recent few critical alerts
+function paint(){
+  const devices = lastDevices;
+  const count = s => devices.filter(d => d.status === s).length;
+  const down = count('down'), slow = count('slow'), up = count('up');
 
+  // hero banner
+  const banner = document.getElementById('banner');
+  const ico = document.getElementById('banner-ico');
+  const bt = document.getElementById('banner-text');
+  const bs = document.getElementById('banner-sub');
+  if(down > 0){
+    banner.className='banner bad'; ico.className='ico bad'; ico.textContent='!';
+    bt.textContent = down+' system'+(down>1?'s':'')+' offline';
+    bs.textContent = 'Immediate attention needed — check the affected devices.';
+  } else if(slow > 0){
+    banner.className='banner warn'; ico.className='ico warn'; ico.textContent='~';
+    bt.textContent = slow+' system'+(slow>1?'s':'')+' degraded';
+    bs.textContent = 'Some devices are responding slowly.';
+  } else {
+    banner.className='banner ok'; ico.className='ico ok'; ico.textContent='✓';
+    bt.textContent = 'All systems operational';
+    bs.textContent = 'Every monitored device is responding normally.';
+  }
+  document.getElementById('banner-meta').innerHTML =
+    devices.length + ' monitored<br>updated ' + new Date().toLocaleTimeString();
+
+  // colorful stat tiles
+  document.getElementById('tiles').innerHTML = `
+    <div class="stat total"><div class="n">${devices.length}</div><div class="l">Total devices</div></div>
+    <div class="stat online"><div class="n">${up}</div><div class="l">Online</div></div>
+    <div class="stat degraded"><div class="n">${slow}</div><div class="l">Degraded</div></div>
+    <div class="stat offline"><div class="n">${down}</div><div class="l">Offline</div></div>`;
+
+  // health by group
+  const groups = {};
+  devices.forEach(d => (groups[d.group] = groups[d.group] || []).push(d));
+  const box = document.getElementById('groups');
+  if(!devices.length){ box.innerHTML = '<div class="empty">no devices configured</div>'; return; }
+
+  box.innerHTML = Object.keys(groups).map(g => {
+    const list = groups[g];
+    const gu = list.filter(d => d.status === 'up').length;
+    const gs = list.filter(d => d.status === 'slow').length;
+    const gd = list.filter(d => d.status === 'down').length;
+    const cls = gd ? 'bad' : gs ? 'warn' : 'ok';
+    const pill = gd ? (gd+' down') : gs ? (gs+' degraded') : 'healthy';
+    const seg = (n,c) => n ? `<i class="${c}" style="width:${n/list.length*100}%"></i>` : '';
+    return `<a class="gcard ${cls}" href="/devices">
+      <div class="gtop"><span class="gname">${esc(g)}</span><span class="gpill">${pill}</span></div>
+      <div class="gbar">${seg(gu,'up')}${seg(gs,'slow')}${seg(gd,'down')}</div>
+      <div class="gfoot">
+        <span class="s-up"><b>${gu}</b> online</span>
+        <span class="s-slow"><b>${gs}</b> degraded</span>
+        <span class="s-down"><b>${gd}</b> offline</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// ---- AI critical issues panel ----
+const CRIT_SHOWN = 3;
 async function loadAlerts(){
   try{
     const res = await fetch('/api/alerts');
+    if(!guard(res)) return;
     const list = await res.json();
     const panel = document.getElementById('alerts');
-    const box = document.getElementById('alerts-list');
-    const critical = list.filter(a => a.severity === 'critical'); // criticals only
+    const out = document.getElementById('alerts-list');
+    const critical = list.filter(a => a.severity === 'critical');
     const shown = critical.slice(0, CRIT_SHOWN);
     panel.classList.toggle('show', shown.length > 0);
-    box.innerHTML = shown.map(a => `
+    out.innerHTML = shown.map(a => `
       <div class="alert ${esc(a.severity)}">
         <span class="sev">${esc(a.severity)}</span>
         <div class="body">
           <div class="a-top">
             <span class="a-host">${esc(a.host)}</span>
+            ${a.category ? `<span class="a-cat">${esc(a.category)}</span>` : ''}
             <span class="a-title">${esc(a.title)}</span>
             <span class="a-time">${timeAgo(a.time)}</span>
           </div>
@@ -298,92 +346,10 @@ async function loadAlerts(){
           : '');
   }catch(err){ /* leave panel as-is on a failed poll */ }
 }
-
 async function dismissAlert(id){
   try{ await fetch('/api/alerts/' + id, { method: 'DELETE' }); }catch(e){}
   loadAlerts();
 }
-
-// ---- render everything from lastDevices + current filter/search ----
-function paint(){
-  const devices = lastDevices;
-  const count = s => devices.filter(d => d.status === s).length;
-  const down = count('down'), slow = count('slow'), up = count('up');
-
-  // banner
-  const banner = document.getElementById('banner');
-  const bt = document.getElementById('banner-text');
-  const ico = banner.querySelector('.ico');
-  if(down > 0){ banner.className='banner bad'; ico.textContent='!'; bt.textContent = down+' system'+(down>1?'s':'')+' offline'; }
-  else if(slow > 0){ banner.className='banner warn'; ico.textContent='~'; bt.textContent = slow+' system'+(slow>1?'s':'')+' degraded'; }
-  else { banner.className='banner ok'; ico.textContent='✓'; bt.textContent='All systems operational'; }
-  document.getElementById('banner-meta').textContent = devices.length + ' monitored';
-
-  // tiles
-  document.getElementById('tiles').innerHTML = `
-    <div class="tile"><div class="n">${devices.length}</div><div class="l">Total</div></div>
-    <div class="tile t-up"><div class="n">${up}</div><div class="l">Online</div></div>
-    <div class="tile t-slow"><div class="n">${slow}</div><div class="l">Degraded</div></div>
-    <div class="tile t-down"><div class="n">${down}</div><div class="l">Offline</div></div>`;
-
-  // apply filter + search
-  let shown = devices;
-  if(filter === 'issues') shown = shown.filter(d => d.status !== 'up');
-  if(query) shown = shown.filter(d =>
-    (d.name + ' ' + d.address).toLowerCase().includes(query.toLowerCase()));
-
-  document.getElementById('count').textContent = shown.length + ' / ' + devices.length + ' shown';
-
-  // group
-  const groups = {};
-  shown.forEach(d => (groups[d.group] = groups[d.group] || []).push(d));
-
-  const board = document.getElementById('board');
-  if(!shown.length){ board.className=''; board.innerHTML = '<div class="empty">no devices match</div>'; return; }
-
-  let html = '';
-  for(const g in groups){
-    const list = groups[g];
-    const gup = list.filter(d => d.status === 'up').length;
-    html += `<div class="group"><div class="ghead"><h2>${g}</h2><div class="gline"></div>`+
-            `<span class="gstat">${gup}/${list.length} up</span></div><div class="grid">`;
-    list.forEach(d => {
-      let metric = '';
-      if(d.metrics && d.metrics.battery != null)
-        metric = `<div class="cmetric">⚡ battery ${d.metrics.battery}%`+
-                 `${d.metrics.onBattery ? ' — ON BATTERY' : ''}</div>`;
-      const msClass = d.status === 'down' ? 'bad' : d.status === 'slow' ? 'warn' : '';
-      html += `
-        <div class="card ${d.status}">
-          <div class="crow">
-            <span class="dot ${d.status}"></span>
-            <span class="cname">${d.name}</span>
-            <span class="badge ${d.status}">${LABEL[d.status]}</span>
-          </div>
-          <div class="caddr">${d.address}</div>
-          ${metric}
-          <div class="uptime">${barsHtml(d.name)}</div>
-          <div class="cfoot">
-            <span>uptime ${uptimePct(d.name)}</span>
-            <span class="ms ${msClass}">${d.ms == null ? 'no response' : d.ms + ' ms'} · ${timeAgo(d.lastChecked)}</span>
-          </div>
-        </div>`;
-    });
-    html += `</div></div>`;
-  }
-  board.className = firstPaint ? 'animate' : '';
-  board.innerHTML = html;
-  firstPaint = false;
-}
-
-// ---- toolbar controls (don't refetch, just repaint) ----
-function setFilter(f){
-  filter = f;
-  document.getElementById('f-all').classList.toggle('on', f === 'all');
-  document.getElementById('f-issues').classList.toggle('on', f === 'issues');
-  paint();
-}
-function onSearch(v){ query = v; paint(); }
 
 // ---- go ----
 load();

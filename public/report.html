@@ -6,106 +6,132 @@
 <title>InfraWatch — Alert Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0e14; --panel:#10151e; --panel-2:#151b26; --line:#1d2531; --line-2:#2a3543;
-    --text:#e4e9f0; --dim:#7d8a9c; --faint:#4a5564;
-    --brand:#38bdf8;
-    --up:#34d399; --up-bg:rgba(52,211,153,.12);
-    --slow:#fbbf24; --slow-bg:rgba(251,191,36,.12);
-    --down:#f87171; --down-bg:rgba(248,113,113,.13);
+    /* dark — deep indigo-navy, warm indigo accent, friendly status hues */
+    --bg:#0b1322; --panel:#171a27; --panel-2:#1d2132; --card:linear-gradient(180deg,#1a1e2e,#15182438);
+    --line:#262b3d; --line-2:#343b52;
+    --text:#edeefb; --dim:#9ba2c0; --faint:#646b8a;
+    --brand:#4f8df5; --accent:#4f8df5; --accent-2:#f5a01e; --accent-soft:rgba(79,141,245,.15);
+    --up:#3ecf8e; --up-bg:rgba(62,207,142,.14);
+    --slow:#f0b144; --slow-bg:rgba(240,177,68,.14);
+    --down:#f56b78; --down-bg:rgba(245,107,120,.15); --down-line:rgba(245,107,120,.38);
     --mono:'JetBrains Mono',ui-monospace,monospace;
-    --topbar-bg:rgba(10,14,20,.85);
+    --display:'Sora','Inter',system-ui,sans-serif;
+    --shadow:0 4px 16px -6px rgba(0,0,0,.5);
+    --shadow-sm:0 1px 3px rgba(0,0,0,.3);
+    --radius:16px; --radius-sm:11px;
   }
   [data-theme="light"]{
-    --bg:#f4f6f9; --panel:#ffffff; --panel-2:#eef2f7; --line:#e2e7ee; --line-2:#cbd4df;
-    --text:#1a2230; --dim:#5b6675; --faint:#9aa5b4;
-    --brand:#0284c7;
-    --up:#059669; --up-bg:rgba(5,150,105,.10);
-    --slow:#b45309; --slow-bg:rgba(217,119,6,.13);
-    --down:#dc2626; --down-bg:rgba(220,38,38,.10);
-    --topbar-bg:rgba(244,246,249,.85);
+    --bg:#eef2fb; --panel:#ffffff; --panel-2:#eff1fa; --card:linear-gradient(180deg,#ffffff,#fbfcff);
+    --line:#e8eaf4; --line-2:#d6dae9;
+    --text:#1b2138; --dim:#5a6388; --faint:#9298b6;
+    --brand:#1f57b6; --accent:#1f57b6; --accent-2:#ef9412; --accent-soft:rgba(31,87,182,.1);
+    --up:#10a368; --up-bg:rgba(16,163,104,.1);
+    --slow:#bd7d09; --slow-bg:rgba(189,125,9,.11);
+    --down:#e0535f; --down-bg:rgba(224,83,95,.1); --down-line:rgba(224,83,95,.28);
+    --shadow:0 6px 20px -10px rgba(40,46,90,.28);
+    --shadow-sm:0 1px 3px rgba(40,46,90,.07);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Archivo',system-ui,sans-serif;background:var(--bg);color:var(--text);
-    -webkit-font-smoothing:antialiased;line-height:1.4;padding-bottom:60px}
-  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.5;padding-bottom:72px;
+    transition:background .25s,color .25s}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(820px 480px at 8% -10%, rgba(79,141,245,.18), transparent 70%),
+      radial-gradient(720px 440px at 102% -4%, rgba(245,160,30,.13), transparent 65%),
+      radial-gradient(660px 440px at 55% 116%, rgba(31,87,182,.11), transparent 72%);}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
   a{color:var(--brand);text-decoration:none}
 
-  .topbar{border-bottom:1px solid var(--line);background:var(--topbar-bg);
-    backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
-  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .topbar{border-bottom:3px solid #f5a01e;background:linear-gradient(180deg,#2059bb,#1a4ea3);
+    position:sticky;top:0;z-index:10;box-shadow:0 2px 14px -4px rgba(0,0,0,.4)}
+  .topbar .wrap{display:flex;align-items:center;gap:22px;height:64px}
   .brand{display:flex;align-items:center;gap:12px}
-  .radar{width:32px;height:32px;border-radius:8px;background:linear-gradient(145deg,#0b3a52,#0a2230);
-    border:1px solid #134b69;display:grid;place-items:center}
-  .brand h1{font-size:16px;font-weight:600;letter-spacing:-.2px}
-  .brand .sub{font-size:11px;color:var(--faint);font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase}
-  .right{display:flex;align-items:center;gap:14px}
-  .navlink{font-size:13px;color:var(--dim);font-family:var(--mono)}
-  .navlink:hover{color:var(--text)}
-  .tbtn{background:var(--panel);border:1px solid var(--line);color:var(--dim);width:34px;height:34px;
-    border-radius:9px;cursor:pointer;font-size:15px;display:grid;place-items:center;transition:.15s}
-  .tbtn:hover{color:var(--text);border-color:var(--line-2)}
+  .mark{width:36px;height:36px;display:grid;place-items:center;background:#fff;border-radius:10px;box-shadow:0 2px 8px -2px rgba(0,0,0,.3)}
+  .mark svg{width:27px;height:27px;display:block}
+  .brand h1{font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:-.3px;color:#fff}
+  .brand .sub{font-size:10.5px;color:rgba(255,255,255,.6);letter-spacing:.5px;text-transform:uppercase;font-weight:500}
+  .nav{display:flex;gap:4px;margin-left:8px}
+  .nav a{font-size:13.5px;color:rgba(255,255,255,.82);font-weight:500;padding:7px 13px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:#fff;background:rgba(255,255,255,.14)}
+  .nav a.on{color:#0e1018;background:#f5a01e}
+  .right{display:flex;align-items:center;gap:16px;margin-left:auto}
+  @media(max-width:760px){.nav{display:none}}
+  .tbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;width:34px;height:34px;
+    border-radius:10px;cursor:pointer;font-size:14px;display:grid;place-items:center;transition:.15s}
+  .tbtn:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.22)}
 
-  .pagehead{margin:24px 0 18px}
-  .pagehead h2{font-size:20px;font-weight:600;letter-spacing:-.3px}
-  .pagehead .meta{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:5px}
+  .pagehead{margin:30px 0 22px}
+  .pagehead h2{font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:-.4px}
+  .pagehead .meta{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:7px}
 
   /* filters */
-  .filters{display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}
-  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
-  .seg button{background:none;border:none;color:var(--dim);padding:8px 14px;font-size:12.5px;cursor:pointer;
-    font-family:'Archivo',sans-serif;font-weight:500;transition:.15s}
-  .seg button:hover{color:var(--text)} .seg button.on{background:var(--panel-2);color:var(--text)}
+  .filters{display:flex;align-items:center;gap:10px;margin-bottom:26px;flex-wrap:wrap}
+  .seg{display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--panel)}
+  .seg button{background:none;border:none;color:var(--dim);padding:9px 16px;font-size:13px;cursor:pointer;
+    font-family:inherit;font-weight:500;transition:.15s}
+  .seg button:hover{color:var(--text)} .seg button.on{background:var(--accent-soft);color:var(--accent)}
   .filters .grow{flex:1}
-  .btn{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:9px;
-    padding:8px 14px;font-size:12.5px;font-family:'Archivo',sans-serif;cursor:pointer;transition:.15s}
-  .btn:hover{border-color:var(--line-2)}
+  .btn{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:var(--radius-sm);
+    padding:9px 16px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 
   /* tiles */
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-  .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
-  .tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--faint)}
-  .tile.t-crit::before{background:var(--down)} .tile.t-warn::before{background:var(--slow)} .tile.t-host::before{background:var(--brand)}
-  .tile .n{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:30px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s}
+  .tile:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tile .top{display:flex;align-items:center;gap:7px}
+  .tile .pip{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .tile.t-crit .pip{background:var(--down)} .tile.t-warn .pip{background:var(--slow)} .tile.t-host .pip{background:var(--accent)}
+  .tile .n{font-family:var(--display);font-size:30px;font-weight:600;line-height:1;letter-spacing:-1px}
   .tile.t-crit .n{color:var(--down)} .tile.t-warn .n{color:var(--slow)} .tile.t-host .n{color:var(--brand)}
-  .tile .l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;font-family:var(--mono)}
+  .tile .l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;
+    margin-top:11px;font-weight:600}
 
   /* two-column panels */
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-  .panel h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:14px}
-  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-family:var(--mono);font-size:12.5px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:30px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;box-shadow:var(--shadow-sm)}
+  .panel h3{font-family:var(--display);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--dim);margin-bottom:18px}
+  .bar-row{display:flex;align-items:center;gap:11px;margin-bottom:11px;font-family:var(--mono);font-size:12.5px}
   .bar-row .lbl{width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
-  .bar-row .track{flex:1;height:9px;background:var(--panel-2);border-radius:5px;overflow:hidden}
-  .bar-row .fill{height:100%;background:var(--brand);border-radius:5px}
+  .bar-row .track{flex:1;height:8px;background:var(--panel-2);border-radius:6px;overflow:hidden}
+  .bar-row .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px}
   .bar-row .fill.crit{background:var(--down)} .bar-row .fill.warn{background:var(--slow)}
   .bar-row .v{width:34px;text-align:right;color:var(--dim)}
   .day-row .lbl{width:96px}
 
   /* table */
-  .tbl-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .tbl-head h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim)}
+  .tbl-head{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+  .tbl-head h3{font-family:var(--display);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--dim)}
   .tbl-head .gline{flex:1;height:1px;background:var(--line)}
   .tbl-head .cnt{font-family:var(--mono);font-size:11px;color:var(--faint)}
-  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
   th{text-align:left;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;
-    color:var(--faint);font-weight:600;padding:11px 14px;border-bottom:1px solid var(--line);background:var(--panel-2)}
-  td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+    color:var(--faint);font-weight:600;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  td{padding:14px 16px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+  tbody tr{transition:background .12s}
+  tbody tr:hover{background:var(--accent-soft)}
   tr:last-child td{border-bottom:none}
   tr.dismissed{opacity:.5}
   .when{font-family:var(--mono);font-size:11.5px;color:var(--dim);white-space:nowrap}
   .host{font-family:var(--mono);font-size:12px;color:var(--text);white-space:nowrap}
   .ttl{color:var(--dim);font-size:12px}
   .sum{color:var(--text);max-width:480px}
-  .sev{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;
-    padding:3px 8px;border-radius:20px;white-space:nowrap}
+  .sev{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+    padding:4px 9px;border-radius:20px;white-space:nowrap}
   .sev.critical{color:var(--down);background:var(--down-bg)}
   .sev.warning{color:var(--slow);background:var(--slow-bg)}
   .sev.unknown,.sev.info{color:var(--dim);background:var(--panel-2)}
   .tag{font-family:var(--mono);font-size:9.5px;color:var(--faint);border:1px solid var(--line-2);
-    padding:1px 6px;border-radius:20px;margin-left:6px}
+    padding:1px 7px;border-radius:20px;margin-left:6px}
+  .cat-chip{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+    color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:20px;white-space:nowrap}
   .empty{text-align:center;color:var(--faint);font-family:var(--mono);font-size:13px;padding:50px 0}
 </style>
 </head>
@@ -113,12 +139,17 @@
 
 <div class="topbar"><div class="wrap">
   <div class="brand">
-    <div class="radar">📊</div>
-    <div><h1>InfraWatch</h1><div class="sub">Alert Report</div></div>
+    <div class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19.5" fill="none" stroke="#1f57b6" stroke-width="5.5"/><rect x="11.5" y="12.8" width="25" height="6.4" rx="1.6" fill="#f5a01e"/><rect x="20.8" y="17" width="6.4" height="18" rx="1.6" fill="#1f57b6"/></svg></div>
+    <div><h1>InfraWatch</h1><div class="sub">Network Operations</div></div>
   </div>
+  <nav class="nav">
+    <a href="/">Overview</a>
+    <a href="/devices">Devices</a>
+    <a href="/report" class="on">Report</a>
+  </nav>
   <div class="right">
-    <a class="navlink" href="/">← Dashboard</a>
     <button class="tbtn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">☀</button>
+    <button class="tbtn" id="logout-btn" onclick="logout()" title="Log out" aria-label="Log out">⏻</button>
   </div>
 </div></div>
 
@@ -167,6 +198,13 @@ function toggleTheme(){
 let days = 7;          // current preset (0 = all time)
 let current = null;    // last report payload
 
+// ---- session ----
+async function logout(){
+  try{ await fetch('/api/logout', { method: 'POST' }); }catch(e){}
+  window.location = '/login';
+}
+function guard(res){ if(res.status === 401){ window.location = '/login'; return false; } return true; }
+
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function fmt(iso){ return iso ? iso.replace('T',' ').slice(0,19) + ' UTC' : '—'; }
@@ -179,6 +217,7 @@ async function load(){
   }
   try{
     const res = await fetch(url);
+    if(!guard(res)) return;
     current = await res.json();
     render(current);
   }catch(err){
@@ -197,10 +236,10 @@ function render(r){
     (r.range && r.range.first ? fmt(r.range.first) + ' → ' + fmt(r.range.last) : 'no data');
 
   document.getElementById('tiles').innerHTML = `
-    <div class="tile"><div class="n">${r.total||0}</div><div class="l">Total alerts</div></div>
-    <div class="tile t-crit"><div class="n">${crit}</div><div class="l">Critical</div></div>
-    <div class="tile t-warn"><div class="n">${warn}</div><div class="l">Warning</div></div>
-    <div class="tile t-host"><div class="n">${hosts}</div><div class="l">Hosts affected</div></div>`;
+    <div class="tile"><div class="top"><span class="pip"></span><div class="n">${r.total||0}</div></div><div class="l">Total alerts</div></div>
+    <div class="tile t-crit"><div class="top"><span class="pip"></span><div class="n">${crit}</div></div><div class="l">Critical</div></div>
+    <div class="tile t-warn"><div class="top"><span class="pip"></span><div class="n">${warn}</div></div><div class="l">Warning</div></div>
+    <div class="tile t-host"><div class="top"><span class="pip"></span><div class="n">${hosts}</div></div><div class="l">Hosts affected</div></div>`;
 
   // by host (horizontal bars, scaled to the busiest host)
   const maxHost = Math.max(1, ...(r.byHost||[]).map(h => h.n));
@@ -228,12 +267,13 @@ function render(r){
     (r.total > rows.length ? ' (of ' + r.total + ')' : '');
   document.getElementById('table-wrap').innerHTML = rows.length ? `
     <table>
-      <thead><tr><th>Time</th><th>Severity</th><th>Host</th><th>Metric</th><th>Summary</th></tr></thead>
+      <thead><tr><th>Time</th><th>Severity</th><th>Host</th><th>Type</th><th>Metric</th><th>Summary</th></tr></thead>
       <tbody>${rows.map(a => `
         <tr class="${a.dismissed ? 'dismissed' : ''}">
           <td class="when">${esc(fmt(a.time))}</td>
           <td><span class="sev ${esc(a.severity)}">${esc(a.severity)}</span></td>
           <td class="host">${esc(a.host)}</td>
+          <td>${a.category ? `<span class="cat-chip">${esc(a.category)}</span>` : '<span class="ttl">—</span>'}</td>
           <td class="ttl">${esc(a.title)}</td>
           <td class="sum">${esc(a.summary)}${a.dismissed ? '<span class="tag">dismissed</span>' : ''}</td>
         </tr>`).join('')}</tbody>
@@ -243,10 +283,10 @@ function render(r){
 // CSV export of the currently loaded rows
 function downloadCsv(){
   if(!current || !(current.alerts||[]).length) return;
-  const head = ['time','severity','host','metric','summary','dismissed'];
+  const head = ['time','severity','host','category','metric','summary','dismissed'];
   const q = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
   const lines = [head.join(',')].concat(current.alerts.map(a =>
-    [a.time, a.severity, a.host, a.title, a.summary, a.dismissed].map(q).join(',')));
+    [a.time, a.severity, a.host, a.category, a.title, a.summary, a.dismissed].map(q).join(',')));
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfraWatch — Devices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1322; --panel:#171a27; --panel-2:#1d2132; --card:linear-gradient(180deg,#1a1e2e,#15182438);
+    --line:#262b3d; --line-2:#343b52;
+    --text:#edeefb; --dim:#9ba2c0; --faint:#646b8a;
+    --accent:#4f8df5; --accent-2:#f5a01e; --accent-soft:rgba(79,141,245,.15);
+    --up:#3ecf8e; --up-bg:rgba(62,207,142,.14); --up-line:rgba(62,207,142,.34);
+    --slow:#f0b144; --slow-bg:rgba(240,177,68,.14); --slow-line:rgba(240,177,68,.34);
+    --down:#f56b78; --down-bg:rgba(245,107,120,.15); --down-line:rgba(245,107,120,.38);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --display:'Sora','Inter',system-ui,sans-serif;
+    --shadow:0 4px 16px -6px rgba(0,0,0,.5);
+    --shadow-sm:0 1px 3px rgba(0,0,0,.3);
+    --radius:16px; --radius-sm:11px;
+  }
+  [data-theme="light"]{
+    --bg:#eef2fb; --panel:#ffffff; --panel-2:#eff1fa; --card:linear-gradient(180deg,#ffffff,#fbfcff);
+    --line:#e8eaf4; --line-2:#d6dae9;
+    --text:#1b2138; --dim:#5a6388; --faint:#9298b6;
+    --accent:#1f57b6; --accent-2:#ef9412; --accent-soft:rgba(31,87,182,.1);
+    --up:#10a368; --up-bg:rgba(16,163,104,.1); --up-line:rgba(16,163,104,.26);
+    --slow:#bd7d09; --slow-bg:rgba(189,125,9,.11); --slow-line:rgba(189,125,9,.28);
+    --down:#e0535f; --down-bg:rgba(224,83,95,.1); --down-line:rgba(224,83,95,.28);
+    --shadow:0 6px 20px -10px rgba(40,46,90,.28);
+    --shadow-sm:0 1px 3px rgba(40,46,90,.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;line-height:1.5;padding-bottom:72px;transition:background .25s,color .25s}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(820px 480px at 8% -10%, rgba(79,141,245,.18), transparent 70%),
+      radial-gradient(720px 440px at 102% -4%, rgba(245,160,30,.13), transparent 65%),
+      radial-gradient(660px 440px at 55% 116%, rgba(31,87,182,.11), transparent 72%);}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+  a{text-decoration:none;color:inherit}
+
+  /* ---------- top bar ---------- */
+  .topbar{border-bottom:3px solid #f5a01e;background:linear-gradient(180deg,#2059bb,#1a4ea3);
+    position:sticky;top:0;z-index:10;box-shadow:0 2px 14px -4px rgba(0,0,0,.4)}
+  .topbar .wrap{display:flex;align-items:center;gap:22px;height:64px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .mark{width:36px;height:36px;display:grid;place-items:center;background:#fff;border-radius:10px;box-shadow:0 2px 8px -2px rgba(0,0,0,.3)}
+  .mark svg{width:27px;height:27px;display:block}
+  .brand h1{font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:-.3px;color:#fff}
+  .brand .sub{font-size:10.5px;color:rgba(255,255,255,.6);letter-spacing:.5px;text-transform:uppercase;font-weight:500}
+  .nav{display:flex;gap:4px;margin-left:8px}
+  .nav a{font-size:13.5px;color:rgba(255,255,255,.82);font-weight:500;padding:7px 13px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:#fff;background:rgba(255,255,255,.14)}
+  .nav a.on{color:#0e1018;background:#f5a01e}
+  .right{display:flex;align-items:center;gap:14px;margin-left:auto}
+  .live{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.78);font-family:var(--mono)}
+  .live .pulse{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.28);animation:blink 2.4s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.45}}
+  .tbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;width:34px;height:34px;
+    border-radius:10px;cursor:pointer;font-size:14px;display:grid;place-items:center;transition:.15s}
+  .tbtn:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.22)}
+
+  .pagehead{margin:28px 0 20px}
+  .pagehead h2{font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:-.4px}
+  .pagehead .meta{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:7px}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+  .seg{display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--panel)}
+  .seg button{background:none;border:none;color:var(--dim);padding:9px 16px;font-size:13px;cursor:pointer;
+    font-family:inherit;font-weight:500;transition:.15s}
+  .seg button:hover{color:var(--text)}
+  .seg button.on{background:var(--accent-soft);color:var(--accent)}
+  .seg button.on.issues{background:var(--down-bg);color:var(--down)}
+  .search{flex:1;min-width:170px;max-width:300px}
+  .search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+    color:var(--text);padding:10px 13px;font-size:13px;font-family:var(--mono);outline:none;transition:.15s}
+  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .search input::placeholder{color:var(--faint)}
+  .count{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--faint)}
+
+  /* ---------- groups + cards ---------- */
+  .group{margin-bottom:32px}
+  .ghead{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+  .ghead h2{font-family:var(--display);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--dim)}
+  .ghead .gline{flex:1;height:1px;background:var(--line)}
+  .ghead .gstat{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:17px 18px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--up);opacity:0;transition:opacity .16s}
+  .card.slow::before{background:var(--slow);opacity:1}
+  .card.down::before{background:var(--down);opacity:1}
+  .card.up::before{opacity:1}
+  .card:hover{transform:translateY(-3px);border-color:var(--line-2);box-shadow:var(--shadow)}
+  .card.slow{background:linear-gradient(180deg,var(--slow-bg),transparent 55%),var(--card)}
+  .card.down{background:linear-gradient(180deg,var(--down-bg),transparent 55%),var(--card);border-color:var(--down-line)}
+  .crow{display:flex;align-items:center;gap:11px}
+  .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--faint)}
+  .dot.up{background:var(--up);box-shadow:0 0 0 4px var(--up-bg)}
+  .dot.slow{background:var(--slow);box-shadow:0 0 0 4px var(--slow-bg)}
+  .dot.down{background:var(--down);box-shadow:0 0 0 4px var(--down-bg)}
+  .cname{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:-.2px}
+  .badge{margin-left:auto;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;
+    text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)}
+  .badge.up{color:var(--up);background:var(--up-bg)}
+  .badge.slow{color:var(--slow);background:var(--slow-bg)}
+  .badge.down{color:var(--down);background:var(--down-bg)}
+  .caddr{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:11px;word-break:break-all}
+  .cmetric{font-family:var(--mono);font-size:12px;color:var(--slow);margin-top:5px}
+
+  .uptime{display:flex;gap:2px;margin-top:15px;height:22px;align-items:flex-end}
+  .uptime i{flex:1;height:100%;border-radius:2px;background:var(--line-2);opacity:.4}
+  .uptime i.up{background:var(--up);opacity:.78} .uptime i.slow{background:var(--slow);opacity:.85}
+  .uptime i.down{background:var(--down);opacity:.92}
+
+  .cfoot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;
+    padding-top:13px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+  .cfoot .ms{color:var(--dim)} .cfoot .ms.bad{color:var(--down)} .cfoot .ms.warn{color:var(--slow)}
+
+  .empty{text-align:center;color:var(--faint);font-family:var(--mono);font-size:13px;padding:50px 0}
+  .animate .card{animation:rise .4s cubic-bezier(.2,.7,.3,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  @media(max-width:760px){.nav{display:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div class="brand">
+    <div class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19.5" fill="none" stroke="#1f57b6" stroke-width="5.5"/><rect x="11.5" y="12.8" width="25" height="6.4" rx="1.6" fill="#f5a01e"/><rect x="20.8" y="17" width="6.4" height="18" rx="1.6" fill="#1f57b6"/></svg></div>
+    <div>
+      <h1>InfraWatch</h1>
+      <div class="sub">Network Operations</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="/">Overview</a>
+    <a href="/devices" class="on">Devices</a>
+    <a href="/report">Report</a>
+  </nav>
+  <div class="right">
+    <button class="tbtn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle light/dark theme">☀</button>
+    <button class="tbtn" id="logout-btn" onclick="logout()" title="Log out" aria-label="Log out">⏻</button>
+    <div class="live"><span class="pulse"></span><span id="live">connecting…</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="pagehead">
+    <h2>Devices</h2>
+    <div class="meta" id="range-meta">Live device status · auto-refreshing every 10s</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="seg">
+      <button id="f-all" class="on" onclick="setFilter('all')">All</button>
+      <button id="f-issues" class="issues" onclick="setFilter('issues')">Issues only</button>
+    </div>
+    <div class="search"><input id="search" type="text" placeholder="search name or ip…" oninput="onSearch(this.value)"></div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div id="board"></div>
+</div>
+
+<script>
+// ---- theme (light / dark) ----
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  try{ localStorage.setItem('iw-theme', t); }catch(e){}
+  const btn = document.getElementById('theme-btn');
+  if(btn) btn.textContent = (t === 'light') ? '☾' : '☀';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+}
+(function(){ let saved; try{ saved = localStorage.getItem('iw-theme'); }catch(e){} applyTheme(saved || 'dark'); })();
+
+const LABEL = { up:'Online', slow:'Degraded', down:'Offline' };
+const MAX = 30;                 // how many recent checks each uptime bar shows
+const history = {};             // device name -> array of past statuses
+let lastDevices = [];
+let filter = 'all';
+let query = '';
+let firstPaint = true;
+
+// ---- session ----
+async function logout(){
+  try{ await fetch('/api/logout', { method: 'POST' }); }catch(e){}
+  window.location = '/login';
+}
+function guard(res){ if(res.status === 401){ window.location = '/login'; return false; } return true; }
+
+function timeAgo(iso){
+  if(!iso) return '—';
+  const s = Math.round((Date.now() - new Date(iso))/1000);
+  if(s < 5) return 'just now';
+  if(s < 60) return s + 's ago';
+  if(s < 3600) return Math.floor(s/60) + 'm ago';
+  return Math.floor(s/3600) + 'h ago';
+}
+function uptimePct(name){
+  const h = history[name] || [];
+  if(!h.length) return '—';
+  const ok = h.filter(s => s !== 'down').length;
+  return Math.round(ok / h.length * 100) + '%';
+}
+function barsHtml(name){
+  const h = history[name] || [];
+  const pad = Math.max(0, MAX - h.length);
+  let out = '';
+  for(let i=0;i<pad;i++) out += '<i></i>';
+  for(const s of h.slice(-MAX)) out += '<i class="'+s+'"></i>';
+  return out;
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ---- fetch loop ----
+async function load(){
+  try{
+    const res = await fetch('/api/status');
+    if(!guard(res)) return;
+    const devices = await res.json();
+    devices.forEach(d => {
+      (history[d.name] = history[d.name] || []).push(d.status);
+      if(history[d.name].length > MAX) history[d.name].shift();
+    });
+    lastDevices = devices;
+    document.getElementById('live').textContent = 'live · ' + new Date().toLocaleTimeString();
+    paint();
+  }catch(err){
+    document.getElementById('live').textContent = 'connection lost';
+  }
+}
+
+function paint(){
+  const devices = lastDevices;
+
+  let shown = devices;
+  if(filter === 'issues') shown = shown.filter(d => d.status !== 'up');
+  if(query) shown = shown.filter(d =>
+    (d.name + ' ' + d.address).toLowerCase().includes(query.toLowerCase()));
+
+  document.getElementById('count').textContent = shown.length + ' / ' + devices.length + ' shown';
+
+  const groups = {};
+  shown.forEach(d => (groups[d.group] = groups[d.group] || []).push(d));
+
+  const board = document.getElementById('board');
+  if(!shown.length){ board.className=''; board.innerHTML = '<div class="empty">no devices match</div>'; return; }
+
+  let html = '';
+  for(const g in groups){
+    const list = groups[g];
+    const gup = list.filter(d => d.status === 'up').length;
+    html += `<div class="group"><div class="ghead"><h2>${esc(g)}</h2><div class="gline"></div>`+
+            `<span class="gstat">${gup}/${list.length} up</span></div><div class="grid">`;
+    list.forEach(d => {
+      let metric = '';
+      if(d.metrics && d.metrics.battery != null)
+        metric = `<div class="cmetric">⚡ battery ${d.metrics.battery}%`+
+                 `${d.metrics.onBattery ? ' — ON BATTERY' : ''}</div>`;
+      const msClass = d.status === 'down' ? 'bad' : d.status === 'slow' ? 'warn' : '';
+      html += `
+        <div class="card ${d.status}">
+          <div class="crow">
+            <span class="dot ${d.status}"></span>
+            <span class="cname">${esc(d.name)}</span>
+            <span class="badge ${d.status}">${LABEL[d.status]}</span>
+          </div>
+          <div class="caddr">${esc(d.address)}</div>
+          ${metric}
+          <div class="uptime">${barsHtml(d.name)}</div>
+          <div class="cfoot">
+            <span>uptime ${uptimePct(d.name)}</span>
+            <span class="ms ${msClass}">${d.ms == null ? 'no response' : d.ms + ' ms'} · ${timeAgo(d.lastChecked)}</span>
+          </div>
+        </div>`;
+    });
+    html += `</div></div>`;
+  }
+  board.className = firstPaint ? 'animate' : '';
+  board.innerHTML = html;
+  firstPaint = false;
+}
+
+function setFilter(f){
+  filter = f;
+  document.getElementById('f-all').classList.toggle('on', f === 'all');
+  document.getElementById('f-issues').classList.toggle('on', f === 'issues');
+  paint();
+}
+function onSearch(v){ query = v; paint(); }
+
+load();
+setInterval(load, 10000);
+</script>
+</body>
+</html>
